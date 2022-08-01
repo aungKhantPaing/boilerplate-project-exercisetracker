@@ -35,10 +35,15 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     const { from, to, limit } = req.query;
     const fromUnix = from ? new Date(from).getTime() : 0;
     const toUnix = to ? new Date(to).getTime() : Number.MAX_SAFE_INTEGER;
-    let log = (user.exercises || []).filter((e) => {
-      const unix = new Date(e.date).getTime();
-      return fromUnix <= unix && unix <= toUnix;
-    });
+    let log = (user.exercises || [])
+      .filter((e) => {
+        const unix = new Date(e.date).getTime();
+        return fromUnix <= unix && unix <= toUnix;
+      })
+      .map((e) => {
+        delete e._id;
+        return e;
+      });
     if (Number.isInteger(Number.parseInt(limit))) {
       log = log.slice(0, limit);
     }
