@@ -64,7 +64,7 @@ app.get("/api/users/:_id/exercises", async (req, res, next) => {
 
 app.post("/api/users", async (req, res) => {
   const newUser = await userModel.create({
-    name: req.body.username,
+    username: req.body.username,
   });
   res.json({
     _id: newUser._id,
