@@ -35,18 +35,18 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     const { from, to, limit } = req.query;
     const fromUnix = from ? new Date(from).getTime() : 0;
     const toUnix = to ? new Date(to).getTime() : Number.MAX_SAFE_INTEGER;
-    let logs = (user.exercises || []).filter((e) => {
+    let log = (user.exercises || []).filter((e) => {
       const unix = new Date(e.date).getTime();
       return fromUnix <= unix && unix <= toUnix;
     });
     if (Number.isInteger(Number.parseInt(limit))) {
-      logs = logs.slice(0, limit);
+      log = log.slice(0, limit);
     }
     res.json({
       _id: user._id,
-      count: logs.length,
+      count: log.length,
       username: user.username,
-      logs,
+      log,
     });
   }
 });
