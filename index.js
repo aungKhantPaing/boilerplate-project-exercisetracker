@@ -19,7 +19,7 @@ app.get("/api/users", async (req, res) => {
   const users = await userModel.aggregate([
     {
       $project: {
-        username: "$name",
+        username: 1,
         __v: 1,
       },
     },
@@ -33,7 +33,7 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     .then((e) => e.toJSON());
   if (user) {
     const { from, to, limit } = req.query;
-    const fromUnix = new Date(from).getTime();
+    const fromUnix = from ? new Date(from).getTime() : 0;
     const toUnix = to ? new Date(to).getTime() : Number.MAX_SAFE_INTEGER;
     let logs = (user.exercises || []).filter((e) => {
       const unix = new Date(e.date).getTime();
@@ -44,8 +44,20 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     }
     res.json({
       _id: user._id,
-      username: user.name,
+      username: user.username,
       logs,
+    });
+  }
+});
+
+app.get("/api/users/:_id/exercises", async (req, res, next) => {
+  const user = await userModel
+    .findOne({ _id: ObjectId(req.params._id) })
+    .catch(next);
+
+  if (user) {
+    res.json({
+      ...user.toJSON(),
     });
   }
 });
@@ -56,7 +68,7 @@ app.post("/api/users", async (req, res) => {
   });
   res.json({
     _id: newUser._id,
-    username: newUser.name,
+    username: newUser.username,
   });
 });
 
@@ -70,7 +82,7 @@ app.post("/api/users/:_id/exercises", async (req, res, next) => {
     .findOneAndUpdate(
       { _id: ObjectId(req.params._id) },
       { $push: { exercises: exercise } },
-      { projection: "name" }
+      { projection: "username" }
     )
     .catch(next);
   if (updatedUser) {
