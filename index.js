@@ -44,6 +44,7 @@ app.get("/api/users/:_id/logs", async (req, res) => {
     }
     res.json({
       _id: user._id,
+      count: logs.length,
       username: user.username,
       logs,
     });
